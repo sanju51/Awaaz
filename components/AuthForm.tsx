@@ -4,31 +4,46 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import Image from 'next/image';
-
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
 import { Form } from "@/components/ui/form"
+import FormField from "@/components/FormField"
 
 
-
-
-const formSchema = z.object({
-  username: z.string().min(2).max(50),
-})
+const authFormSchema = (type: FormType) => {
+  return z.object({
+    name:type === 'sign-up' ? z.string().min(3) : z.string().optional(),
+    email: z.string().email(),
+    password: z.string().min(8)
+   })
+}
 
 const AuthForm=({type}: {type:FormType}) => {
+  const formSchema = authFormSchema(type)
     const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      name:"",
+      email: "",
+      password: "",
     },
   })
  
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+    try{
+      if(type=="sign-up"){
+        console.log("SIGN UP", values);
+      }
+      else{
+        console.log("SIGN IN", values);
+      }
+    }
+    catch(error){
+      console.log(error)
+      toast.error("Something went wrong")
+    }
   }
 
   const isSignIn=type=='sign-in';
@@ -44,9 +59,11 @@ const AuthForm=({type}: {type:FormType}) => {
             
             <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className=" w-full space-y-6 mt-4 form">
-        {!isSignIn && <p>Name</p>}
-        <p>Email</p>
-        <p>Password </p>
+        {!isSignIn && (
+          <FormField control={form.control} name="name" label="Name" placeholder="Enter your Name" />
+        )}
+        <FormField control={form.control} name="email" label="Email" placeholder="Enter your Email address" type="email"/>
+        <FormField control={form.control} name="password" label="Password" placeholder="Set your Password" type="password"/>
         <Button className="btn" type="submit">{isSignIn?'Sign in':"Create an account"}</Button>
       </form>
     </Form>
