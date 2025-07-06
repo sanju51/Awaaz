@@ -23,9 +23,11 @@ const FormField =({control,name,label,placeholder,type="text"}:FormFieldProps<T>
     control={control}
     render={({ field }) => (
       <FormItem>
-        <FormLabel>Username</FormLabel>
+        <FormLabel className="label">{label}</FormLabel>
         <FormControl>
-          <Input placeholder={placeholder} {...field} />
+          <Input placeholder={placeholder}
+          type={type}
+          {...field} />
         </FormControl>
       
         <FormMessage />
